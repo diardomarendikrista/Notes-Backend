@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { authorize, authenticate } = require("../middlewares/auth");
+const { authorize, authorizeRead, authenticate } = require("../middlewares/auth");
 const Controller = require("../controllers");
 const UserController = require("../controllers/userController");
 const NoteController = require("../controllers/noteController");
@@ -18,5 +18,10 @@ router.delete("/users/:id", UserController.deleteUser);
 
 // Note
 router.get("/notes", NoteController.readAll);
+router.get("/notes/:id", authorizeRead, NoteController.readById);
+router.post("/notes", NoteController.addNote);
+router.post("/notes/:id", NoteController.addNote);
+router.put("/notes/:id", authorize, NoteController.editNote);
+router.delete("/notes/:id", authorize, NoteController.deleteNote);
 
 module.exports = router;

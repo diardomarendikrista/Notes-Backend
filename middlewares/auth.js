@@ -32,6 +32,7 @@ const authorize = (req, res, next) => {
 
   Note.findOne({ where: { id } })
     .then((data) => {
+      console.log(data.user_id, req.decoded.id);
       if (data) {
         if (data.user_id == req.decoded.id) next();
         else {
@@ -50,7 +51,36 @@ const authorize = (req, res, next) => {
     .catch(next);
 };
 
+
+const authorizeRead = (req, res, next) => {
+  const { id } = req.params;
+
+  Note.findOne({ where: { id } })
+    .then((data) => {
+      if (data.status == 'public') next()
+      else {
+        console.log(data.user_id, req.decoded.id);
+        if (data) {
+          if (data.user_id == req.decoded.id) next();
+          else {
+            next({
+              code: 401,
+              message: "Unauthorize access",
+            });
+          }
+        } else {
+          next({
+            code: 404,
+            message: "Not Found",
+          });
+        }
+      }
+    })
+    .catch(next);
+};
+
 module.exports = {
   authenticate,
+  authorizeRead,
   authorize,
 };
