@@ -6,9 +6,12 @@ class UserController {
   static async readAll(req, res, next) {
     try {
       // must be admin role
-      console.log(req.decoded);
       if (req.decoded.role === "admin") {
-        const users = await User.findAll();
+        const users = await User.findAll({
+          attributes: {
+            exclude: ["password"],
+          },
+        });
         res.status(200).json({ status: "success", users });
       } else {
         res.status(401).json({ status: "error", message: "You are unauthorized" });
@@ -74,17 +77,22 @@ class UserController {
     const { id } = req.params;
 
     try {
-      const user = await User.destroy({ where: { id } });
-      if (user) {
-        res
-          .status(200)
-          .json({ status: "success", message: "user has been deleted." });
+      // must be admin role
+      if (req.decoded.role === "admin") {
+        const user = await User.destroy({ where: { id } });
+        if (user) {
+          res
+            .status(200)
+            .json({ status: "success", message: "user has been deleted." });
+        } else {
+          next({
+            status: "error",
+            code: 404,
+            message: "User Not Found",
+          });
+        }
       } else {
-        next({
-          status: "error",
-          code: 404,
-          message: "User Not Found",
-        });
+        res.status(401).json({ status: "error", message: "You are unauthorized" });
       }
     } catch (error) {
       next(error);

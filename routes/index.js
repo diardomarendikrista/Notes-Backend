@@ -20,7 +20,6 @@ router.delete("/users/:id", UserController.deleteUser);
 router.get("/notes", NoteController.readAll);
 router.get("/notes/:id", authorizeRead, NoteController.readById);
 router.post("/notes", NoteController.addNote);
-router.post("/notes/:id", NoteController.addNote);
 router.put("/notes/:id", authorize, NoteController.editNote);
 router.delete("/notes/:id", authorize, NoteController.deleteNote);
 
