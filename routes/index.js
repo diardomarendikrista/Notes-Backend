@@ -14,6 +14,7 @@ router.post("/login", UserController.login);
 // Need auth
 router.use(authenticate);
 router.get("/users", UserController.readAll);
+router.get("/user", UserController.readById);
 router.delete("/users/:id", UserController.deleteUser);
 
 // Note

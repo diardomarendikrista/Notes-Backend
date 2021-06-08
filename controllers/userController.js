@@ -14,8 +14,26 @@ class UserController {
         });
         res.status(200).json({ status: "success", users });
       } else {
-        res.status(401).json({ status: "error", message: "You are unauthorized" });
+        res
+          .status(401)
+          .json({ status: "error", message: "You are unauthorized" });
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async readById(req, res, next) {
+    const { id } = req.decoded;
+
+    try {
+      const user = await User.findOne({
+        where: { id },
+        attributes: {
+          exclude: ["password"],
+        },
+      })
+      res.status(200).json({ status: "success", user });
     } catch (error) {
       next(error);
     }
@@ -30,8 +48,17 @@ class UserController {
 
     try {
       const user = await User.create(newUser);
-      console.log(user);
-      res.status(201).json({ status: "success", user });
+      const data = await User.findOne({
+        where: {
+          id: user.id,
+        },
+        attributes: {
+          exclude: ["password"],
+        },
+      });
+
+      console.log(data);
+      res.status(201).json({ status: "success", data });
     } catch (error) {
       next(error);
     }
@@ -92,7 +119,9 @@ class UserController {
           });
         }
       } else {
-        res.status(401).json({ status: "error", message: "You are unauthorized" });
+        res
+          .status(401)
+          .json({ status: "error", message: "You are unauthorized" });
       }
     } catch (error) {
       next(error);

@@ -7,7 +7,7 @@ class NoteController {
     try {
       const data = await Note.findAll({
         where: {
-          user_id: id
+          user_id: id,
         },
         include: {
           model: User,
@@ -15,6 +15,7 @@ class NoteController {
             exclude: ["password"],
           },
         },
+        order: [["createdAt", "DESC"]],
       });
       res.status(200).json(data);
     } catch (error) {
@@ -34,7 +35,7 @@ class NoteController {
             exclude: ["password"],
           },
         },
-      })
+      });
       res.status(200).json(data);
     } catch (error) {
       next(error);
@@ -48,7 +49,7 @@ class NoteController {
       title: req.body.title,
       note: req.body.note,
       tag: req.body.tag,
-      status: req.body.status || "public",
+      status: req.body.status || "private",
       user_id: id,
     };
 
