@@ -51,29 +51,27 @@ const authorize = (req, res, next) => {
     .catch(next);
 };
 
-
 const authorizeRead = (req, res, next) => {
   const { id } = req.params;
 
   Note.findOne({ where: { id } })
     .then((data) => {
-      if (data.status == 'public') next()
-      else {
+      if (data) {
         console.log(data.user_id, req.decoded.id);
-        if (data) {
-          if (data.user_id == req.decoded.id) next();
-          else {
-            next({
-              code: 401,
-              message: "Unauthorize access",
-            });
-          }
-        } else {
+        // status disable due to still buggy
+        // if (data.user_id == req.decoded.id || data.status == "public") next();
+        if (data.user_id == req.decoded.id) next();
+        else {
           next({
-            code: 404,
-            message: "Not Found",
+            code: 401,
+            message: "Unauthorize access",
           });
         }
+      } else {
+        next({
+          code: 404,
+          message: "Not Found",
+        });
       }
     })
     .catch(next);
