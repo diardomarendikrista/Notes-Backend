@@ -1,4 +1,5 @@
 const { User, Note } = require("../models");
+const Op = require("sequelize").Op;
 
 class NoteController {
   static async readAll(req, res, next) {
@@ -37,6 +38,34 @@ class NoteController {
         },
       });
       res.status(200).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async searchNote(req, res, next) {
+    const { id } = req.decoded;
+    const { keyword } = req.params;
+
+    try {
+      const data = await Note.findAll({
+        where: {
+          user_id: id,
+          [Op.or]: {
+            title: { [Op.iLike]: `%${keyword}%` },
+            note: { [Op.iLike]: `%${keyword}%` },
+            tag: { [Op.iLike]: `%${keyword}%` },
+          },
+        },
+        include: {
+          model: User,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+        order: [["createdAt", "DESC"]],
+      });
+      res.status(200).json({ status: "success", data });
     } catch (error) {
       next(error);
     }
