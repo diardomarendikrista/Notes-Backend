@@ -93,7 +93,7 @@ class NoteController {
           },
         },
       });
-      res.status(201).json({ status: "success", data: addedNote.data });
+      res.status(201).json({ status: "success", data: addedNote });
     } catch (error) {
       next(error);
     }
