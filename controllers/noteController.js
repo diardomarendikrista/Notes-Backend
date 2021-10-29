@@ -84,7 +84,16 @@ class NoteController {
 
     try {
       const data = await Note.create(newNote);
-      res.status(201).json({ status: "success", data: data });
+      const addedNote = await Note.findOne({
+        where: { id: data.id },
+        include: {
+          model: User,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+      });
+      res.status(201).json({ status: "success", data: addedNote.data });
     } catch (error) {
       next(error);
     }
