@@ -84,7 +84,7 @@ class NoteController {
 
     try {
       const data = await Note.create(newNote);
-      res.status(201).json({ status: "success", data: newNote });
+      res.status(201).json({ status: "success", data: data });
     } catch (error) {
       next(error);
     }
@@ -94,6 +94,7 @@ class NoteController {
     const { id } = req.params;
 
     const updateNote = {
+      id,
       title: req.body.title,
       note: req.body.note,
       tag: req.body.tag,
@@ -101,8 +102,17 @@ class NoteController {
     };
 
     try {
-      const update = await Note.update(updateNote, { where: { id } });
-      res.status(200).json({ status: "success", data: updateNote });
+      await Note.update(updateNote, { where: { id } });
+      const updatedNote = await Note.findOne({
+        where: { id },
+        include: {
+          model: User,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+      });
+      res.status(200).json({ status: "success", data: updatedNote });
     } catch (error) {
       next(error);
     }
@@ -112,7 +122,7 @@ class NoteController {
     const { id } = req.params;
 
     try {
-      const note = await Note.destroy({ where: { id } });
+      await Note.destroy({ where: { id } });
       res
         .status(200)
         .json({ status: "success", message: "note has been deleted." });
