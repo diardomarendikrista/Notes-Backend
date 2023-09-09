@@ -1,4 +1,4 @@
-const { User, Note } = require("../models");
+const { User, Note, Todo } = require("../models");
 const Op = require("sequelize").Op;
 
 class NoteController {
@@ -30,12 +30,17 @@ class NoteController {
     try {
       const data = await Note.findOne({
         where: { id },
-        include: {
-          model: User,
-          attributes: {
-            exclude: ["password"],
+        include: [
+          {
+            model: User,
+            attributes: {
+              exclude: ["password"],
+            },
           },
-        },
+          {
+            model: Todo,
+          },
+        ],
       });
       res.status(200).json(data);
     } catch (error) {
@@ -78,6 +83,7 @@ class NoteController {
       title: req.body.title,
       note: req.body.note,
       tag: req.body.tag,
+      type: req.body.type,
       status: req.body.status || "private",
       user_id: id,
     };
@@ -107,6 +113,7 @@ class NoteController {
       title: req.body.title,
       note: req.body.note,
       tag: req.body.tag,
+      type: req.body.type,
       status: req.body.status || "public",
     };
 
